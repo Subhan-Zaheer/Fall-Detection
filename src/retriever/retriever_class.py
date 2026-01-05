@@ -9,11 +9,6 @@ from torch.utils.data import Dataset
 
 from src.configs import ROOT_DIR, transform
 
-# transform = transforms.Compose([
-#             transforms.Resize((224, 224)),
-#             transforms.ToTensor(),
-#             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
-#         ])
 
 class FallVideoDataset(Dataset):
     class_samples = []
