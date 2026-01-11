@@ -50,7 +50,6 @@ class Trainer:
 
     def train_model(self,):
         
-
         # Loss + Optimizer
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
