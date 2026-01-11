@@ -7,6 +7,7 @@ import pandas as pd
 
 from PIL import Image
 import torch.nn as nn
+from pathlib import Path
 from torchvision import transforms
 import torchvision.models as models
 from torch.utils.data import Dataset
@@ -14,8 +15,11 @@ from torch.utils.data import DataLoader
 
 
 
+
+
 ROOT_DIR = "src"
-WEIGHTS_PATH = "../src/weights/full_model.pth"
+BASE_DIR = Path(__file__).resolve().parent
+WEIGHTS_PATH = BASE_DIR / "weights" / "full_model.pth"
 MAX_FRAMES = 300
 # ROOT_DIR = "/home/ubuntu/addtitional_drive/temp_Training/Dataset_CAUCAFall/CAUCAFall"
 
