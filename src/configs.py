@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader
 
 
 
-ROOT_DIR = "src"
+ROOT_DIR = "D:\\Fall Dataset\\code\\Dataset CAUCAFall_1\\Dataset CAUCAFall\\CAUCAFall"
 WEIGHTS_PATH = "src\\weights\\full_model.pth"
 MAX_FRAMES = 300
 # ROOT_DIR = "/home/ubuntu/addtitional_drive/temp_Training/Dataset_CAUCAFall/CAUCAFall"
