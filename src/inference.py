@@ -36,12 +36,19 @@ def load_model(model_path, device='cuda'):
     model.eval()
     return model
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model = load_model(model_path=WEIGHTS_PATH, device=device)
+
 def _transform_frame(frames):
     transformed_frames = []
     for frame in frames:
-        transformed_frame = transform(frame)
-        transformed_frames.append(transformed_frame)
-
+        try:
+            if frame.mode != "RGB":
+                frame = frame.convert("RGB")
+            transformed_frame = transform(frame)
+            transformed_frames.append(transformed_frame)
+        except Exception as e:
+            raise ValueError(f"Frame Transformation Error: {e} at frame : {frame}")
     return torch.stack(transformed_frames)
     
 
@@ -83,7 +90,7 @@ def frames_from_video(path, num_frames=16, size=(224, 224)):
     return frames   # shape: (num_frames, H, W, 3)
 
 
-def inference(path):
+def inference(path, model, device):
     if os.path.isdir(path):
         frames_path = glob.glob(f'{path}/*.*g')[-300:]
         frames = []
@@ -101,19 +108,32 @@ def inference(path):
         else:
             frames = frames_from_video(path=path, num_frames=MAX_FRAMES, size=(224, 224))
     
-    frames = _transform_frame(frames=frames)  # (T, H, W, C)
-    frames = frames.unsqueeze(0)  # (1, T, C, H, W)
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    frames = frames.to(device)
-    model = load_model(model_path=WEIGHTS_PATH, device=device)
+    try:
+        frames = _transform_frame(frames=frames)  # (T, H, W, C)
+        frames = frames.unsqueeze(0)  # (1, T, C, H, W)
+        
+        frames = frames.to(device)
+        output = model(frames)
+        
+        output = output.detach().cpu().numpy()
+        mapping_ = {0: 'No Fall', 1: 'Fall'}
+        predicted_class = np.argmax(output, axis=1)[0]
     
-    output = model(frames)
-    
-    output = output.detach().cpu().numpy()
-    mapping_ = {0: 'No Fall', 1: 'Fall'}
-    predicted_class = np.argmax(output, axis=1)[0]
+    except Exception as e:
+        raise ValueError(f"Inference Error: {e}")
     
     return mapping_[predicted_class]
+
+class FallDetector:
+    def __init__(self, model_path=WEIGHTS_PATH, device=device):
+        self.device = device
+        self.model = load_model(model_path=model_path, device=self.device)
+    
+    def predict(self, path):
+        return inference(path, self.model, self.device)
+    
+
+fall_detector = FallDetector()
     
 
     
